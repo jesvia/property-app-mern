@@ -4,6 +4,7 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { app } from '../firebase';
 import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserStart, deleteUserSuccess, signOutUserStart, signOutUserFailure, signOutUserSuccess } from '../redux/user/userSlice.js';
 import { useDispatch } from 'react-redux';
+import {Link} from 'react-router-dom';
 
 export default function Profile() {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -130,10 +131,13 @@ export default function Profile() {
       <button disabled={loading} className='bg-purple-500 text-white p-3 rounded-lg uppercase hover:opacity-65 disabled:opacity-50'>
         {loading? 'Updating...' : 'Update'}
       </button>
+      <Link to={'/create-listing'} className='bg-cyan-500 text-white p-3 rounded-lg uppercase hover:opacity-65 text-center'>
+      Create Listing
+      </Link>
       </form>
       <div className='flex justify-between mt-2'>
         <span onClick={handleDeleteUser} className='text-red-600 cursor-pointer'>Delete Account</span>
-        <span onClick={handleSignOut} className='text-cyan-500 cursor-pointer'>Sign Out</span>
+        <span onClick={handleSignOut} className='text-red-600 cursor-pointer'>Sign Out</span>
       </div>
       <p className='text-red-600 mt-3'>{error? error : ''}</p>
       <p className='text-green-600'>{updateSucess? 'Profile Updated Successfully!' : ''}</p>
