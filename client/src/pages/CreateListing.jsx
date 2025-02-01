@@ -133,7 +133,7 @@ export default function CreateListing() {
                 setError(data.message);
                 return;
             }
-            navigate(`/listing/${currentUser._id}`);
+            navigate(`/listings/${currentUser._id}`);
         } catch (error) {
             setError(error.message);
             setLoading(false);

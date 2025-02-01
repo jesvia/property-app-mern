@@ -5,6 +5,7 @@ import { app } from '../firebase';
 import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserFailure, deleteUserStart, deleteUserSuccess, signOutUserStart, signOutUserFailure, signOutUserSuccess } from '../redux/user/userSlice.js';
 import { useDispatch } from 'react-redux';
 import {Link} from 'react-router-dom';
+import { set } from 'mongoose';
 
 export default function Profile() {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -14,6 +15,9 @@ export default function Profile() {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUpError, setFileUpError] = useState(false);
   const [updateSucess, setUpdateSucess] = useState(false);
+  const [showListingsError, setShowListingsError] = useState(false);
+  const [listingsLoading, setListingsLoading] = useState(false);
+  const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
  
 
@@ -106,6 +110,23 @@ export default function Profile() {
         dispatch(signOutUserFailure(error.message));
       }
     }
+    const handleShowListings = async() => {
+      try {
+        setListingsLoading(true);
+        setShowListingsError(false);
+        const res = await fetch(`/api/user/listings/${currentUser._id}`);
+        const data = await res.json();
+        setListingsLoading(false);
+        if (data.success === false) {
+          setShowListingsError(true);
+          return;
+        }
+        setUserListings(data);
+
+      } catch (error) {
+        setShowListingsError(true);
+      }
+    }
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl text-center font-semibold my-7 text-purple-700'>Profile</h1>
@@ -141,6 +162,29 @@ export default function Profile() {
       </div>
       <p className='text-red-600 mt-3'>{error? error : ''}</p>
       <p className='text-green-600'>{updateSucess? 'Profile Updated Successfully!' : ''}</p>
+      <button onClick={handleShowListings} className='text-purple-500 uppercase w-full cursor-pointer hover:font-semibold'>
+        {listingsLoading? 'Loading...' : 'Show Listings'}
+      </button>
+      <p>{showListingsError? 'Error Showing Listings' : ''}</p>
+      {userListings && userListings.length > 0 && 
+        <div className='flex flex-col gap-4'>
+          <h1 className='text-3xl text-center font-semibold my-5 text-cyan-700'>Your Listings</h1>
+        {userListings.map((listing) => (
+          <div key={listing._id} className='flex justify-between items-center border border-cyan-500 rounded-lg p-2 gap-4'>
+            <Link to={`/listing/${listing._id}`}>
+              <img src={listing.imageUrls[0]} alt="listing image cover" className='w-16 h-16 object-contain' />
+            </Link>
+            <Link className='font-semibold text-purple-500 flex-1 hover:text-black truncate' to={`/listing/${listing._id}`}>
+              <p >{listing.name}</p>
+            </Link>
+            <div className='flex flex-col items-center'>
+              <button className='text-red-600 uppercase cursor-pointer hover:text-black '>Delete</button>
+              <button className='text-cyan-500 uppercase cursor-pointer hover:text-black'>Edit</button>
+            </div>
+          </div>
+        ))}
+        </div>
+      }
     </div>
   )
 }
