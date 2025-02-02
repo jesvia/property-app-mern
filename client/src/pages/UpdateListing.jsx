@@ -148,7 +148,7 @@ export default function UpdateListing() {
                 setError(data.message);
                 return;
             }
-            navigate(`/listing/${currentUser._id}`);
+            navigate(`/listing/${params.listingId}`);
         } catch (error) {
             setError(error.message);
             setLoading(false);
